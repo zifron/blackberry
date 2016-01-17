@@ -1,17 +1,7 @@
 /*
-* Copyright (c) 2011-2012 Research In Motion Limited.
+* Copyright (c) 2016 Isenzo.
 *
-* Licensed under the Apache License, Version 2.0 (the "License");
-* you may not use this file except in compliance with the License.
-* You may obtain a copy of the License at
-*
-* http://www.apache.org/licenses/LICENSE-2.0
-*
-* Unless required by applicable law or agreed to in writing, software
-* distributed under the License is distributed on an "AS IS" BASIS,
-* WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-* See the License for the specific language governing permissions and
-* limitations under the License.
+* This application will make it possible to create your own TravelBingo on a Blackberry Playbook tablet
 */
 
 #include <assert.h>
@@ -21,14 +11,10 @@
 #include <bps/screen.h>
 #include <fcntl.h>
 #include <screen/screen.h>
-#include <bps/dialog.h>     //Include for displaying a dialog box
-#include <stdio.h>
-#include <stdlib.h>
-
-
 
 static bool shutdown;
 
+//Standard event handlings.
 static void
 handle_screen_event(bps_event_t *event)
 {
@@ -87,94 +73,10 @@ handle_event()
     }
 }
 
-/**
- * Show an alert dialog that has two buttons: a "Cancel" button, and a "Submit" button.
- */
-static void
-show_alert()
-{
-    if (alert_dialog) {
-        return;
-    }
-
-    if (dialog_create_alert(&alert_dialog) != BPS_SUCCESS) {
-        fprintf(stderr, "Failed to create alert dialog.");
-        return;
-    }
-
-    if (dialog_set_alert_message_text(alert_dialog, "Hello Tobias, Daniel en Olivier!") != BPS_SUCCESS) {
-        fprintf(stderr, "Failed to set alert dialog message text.");
-        dialog_destroy(alert_dialog);
-        alert_dialog = 0;
-        return;
-    }
-
-    /*
-     * Create a context to attach to the cancel button
-     */
-    char* cancel_button_context = "Annuleren";
-
-    /*
-     * Use a button label defined in bps/dialog.h. Attach a context to the button.
-     */
-    if (dialog_add_button(alert_dialog, DIALOG_CANCEL_LABEL, true, cancel_button_context, true) != BPS_SUCCESS) {
-        fprintf(stderr, "Failed to add button to alert dialog.");
-        dialog_destroy(alert_dialog);
-        alert_dialog = 0;
-        return;
-    }
-
-    /*
-     * Use a button label of our own. Don't attach a context to the button.
-     */
-    if (dialog_add_button(alert_dialog, "Ga maar door", true, 0, true) != BPS_SUCCESS) {
-        fprintf(stderr, "Failed to add button to alert dialog.");
-        dialog_destroy(alert_dialog);
-        alert_dialog = 0;
-        return;
-    }
-
-    if (dialog_show(alert_dialog) != BPS_SUCCESS) {
-        fprintf(stderr, "Failed to show alert dialog.");
-        dialog_destroy(alert_dialog);
-        alert_dialog = 0;
-        return;
-    }
-}
-
-/**
- * Handle a dialog response.
- */
-static void
-handle_dialog_response(bps_event_t *event)
-{
-    /*
-     * Double check that the event is valid
-     */
-    if (event == NULL) {
-        return;
-    }
-
-    int selectedIndex = dialog_event_get_selected_index(event);
-    const char* label = dialog_event_get_selected_label(event);
-    const char* context = dialog_event_get_selected_context(event);
-
-    char output[1024];
-    snprintf(output, 1024, "Selected Index: %d, Label: %s, Context: %s\n",
-            selectedIndex, label?label:"n/a", context?(char*)context:"n/a");
-    fprintf(stderr, output);
-
-    dialog_destroy(alert_dialog);
-    alert_dialog = 0;
-}
-
-
-
-
 int
 main(int argc, char **argv)
 {
-    const int usage = SCREEN_USAGE_NATIVE;
+ 	const int usage = SCREEN_USAGE_NATIVE;
 
     screen_context_t screen_ctx;
     screen_window_t screen_win;
@@ -209,13 +111,6 @@ main(int argc, char **argv)
         * We request dialog events so we can be notified when the dialog service responds to our requests/queries.
         */
     navigator_request_events(0);
-    dialog_request_events(0);    //dialog events are requested so that we can be notified.
-
-    /*
-      * start the application with a dialog.
-      */
-     show_alert();
-
 
     while (!shutdown) {
         /* Handle user input */
@@ -229,4 +124,3 @@ main(int argc, char **argv)
     screen_destroy_context(screen_ctx);
     return 0;
 }
-
